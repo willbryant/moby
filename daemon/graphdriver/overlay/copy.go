@@ -116,6 +116,10 @@ func copyDir(srcDir, dstDir string, flags copyFlags) error {
 			}
 
 		case os.ModeDevice:
+			if rsystem.RunningInUserNS() {
+				// cannot create a device if running in user namespace
+				return nil
+			}
 			if err := unix.Mknod(dstPath, stat.Mode, int(stat.Rdev)); err != nil {
 				return err
 			}
